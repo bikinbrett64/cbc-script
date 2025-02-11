@@ -15,7 +15,6 @@
 
 // Timing constants.
 #define FRAME_DURATION_MS 200
-#define BUTTON_DEBOUNCE_DELAY_US 5000
 #define MAG_SENSOR_DEBOUNCE_DELAY_US 5000
 #define BUTTON_BRIEF_PRESS_MS 200
 #define BUTTON_HOLD_DELAY_MS 1000
@@ -30,20 +29,6 @@ enum PROGRAM_STATE {
 
 // For tracking the time elapsed since the last frame was printed.
 unsigned long frameTimer;
-
-// Variables related to the buttons.
-// volatile unsigned long lastUpButtonPress = 0;
-// volatile unsigned long lastDownButtonPress = 0;
-// volatile unsigned long lastLeftButtonPress = 0;
-// volatile unsigned long lastRightButtonPress = 0;
-// volatile unsigned long lastUpButtonRelease = 0;
-// volatile unsigned long lastDownButtonRelease = 0;
-// volatile unsigned long lastLeftButtonRelease = 0;
-// volatile unsigned long lastRightButtonRelease = 0;
-// volatile bool upButtonDown = false;
-// volatile bool downButtonDown = false;
-// volatile bool leftButtonDown = false;
-// volatile bool rightButtonDown = false;
 
 // For detecting an overflow of micros().
 volatile unsigned long mostRecentInput = 0;
