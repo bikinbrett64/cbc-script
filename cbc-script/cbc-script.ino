@@ -69,18 +69,12 @@ void setup() {
   pinMode(MAG_SENSOR, INPUT_PULLUP);
 
   // Attaching interrupts.
-  attachInterrupt(up.pin, recordUpButtonPress, FALLING);
-  attachInterrupt(down.pin, recordDownButtonPress, FALLING);
-  attachInterrupt(left.pin, recordLeftButtonPress, FALLING);
-  attachInterrupt(right.pin, recordRightButtonPress, FALLING);
-
-  attachInterrupt(up.pin, recordUpButtonRelease, RISING);
-  attachInterrupt(down.pin, recordDownButtonRelease, RISING);
-  attachInterrupt(left.pin, recordLeftButtonRelease, RISING);
-  attachInterrupt(right.pin, recordRightButtonRelease, RISING);
+  attachInterrupt(digitalPinToInterrupt(up.pin), recordUpButtonInteraction, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(down.pin), recordDownButtonInteraction, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(left.pin), recordLeftButtonInteraction, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(right.pin), recordRightButtonInteraction, CHANGE);
 
   attachInterrupt(MAG_SENSOR, recordMagSensorClose, FALLING);  // The magnetic sensor is handled a bit differently.
-  attachInterrupt(MAG_SENSOR, recordMagSensorOpen, RISING);
 
   frameTimer = millis();
 }
@@ -121,69 +115,43 @@ bool microsOverflow() {
   return micros() < mostRecentInput;
 }
 
-// ISR - records a press of the up button.
-void recordUpButtonPress() {
-  recordButtonPress(&up);
+// ISR - records an interaction with the up button.
+void recordUpButtonInteraction() {
+  recordButtonInteraction(&up);
 }
 
-// ISR - records a press of the down button.
-void recordDownButtonPress() {
-  recordButtonPress(&down);
+// ISR - records an interaction with the down button.
+void recordDownButtonInteraction() {
+  recordButtonInteraction(&down);
 }
 
-// ISR - records a press of the left button.
-void recordLeftButtonPress() {
-  recordButtonPress(&left);
+// ISR - records an interaction with the left button.
+void recordLeftButtonInteraction() {
+  recordButtonInteraction(&left);
 }
 
-// ISR - records a press of the right button.
-void recordRightButtonPress() {
-  recordButtonPress(&right);
-}
-
-// ISR - records a release of the up button.
-void recordUpButtonRelease() {
-  recordButtonRelease(&up);
-}
-
-// ISR - records a release of the down button.
-void recordDownButtonRelease() {
-  recordButtonRelease(&down);
-}
-
-// ISR - records a release of the left button.
-void recordLeftButtonRelease() {
-  recordButtonRelease(&left);
-}
-
-// ISR - records a release of the right button.
-void recordRightButtonRelease() {
-  recordButtonRelease(&right);
+// ISR - records an interaction with the right button.
+void recordRightButtonInteraction() {
+  recordButtonInteraction(&right);
 }
 
 // ISR - records a closing of the magnetic sensor.
 void recordMagSensorClose() {
-  mostRecentInput = lastMagSensorClose = micros();
+  mostRecentInput = lastMagSensorClose = millis();
   magSensorClosed = true;
 }
 
-// ISR - records an opening of the magnetic sensor.
-void recordMagSensorOpen() {
-  mostRecentInput = lastMagSensorOpen = micros();
-  magSensorClosed = false;
-}
-
-// Helper function - this is called whenever a button's pin goes low.
-void recordButtonPress(button* b) {
-  mostRecentInput = b->lastPress = micros();
-  b->buttonDown = true;
-}
-
-// Helper function - this is called whenever a button's pin goes high.
-void recordButtonRelease(button* b) {
-  mostRecentInput = b->lastRelease = micros();
-  b->buttonDown = false;
-  if (micros() > b->lastPress + BUTTON_DEBOUNCE_DELAY_US) {
-    b->pressHandled = false;
+// Helper function - this is called whenever a button is pressed/released.
+void recordButtonInteraction(button* b) {
+  bool isPressed = !digitalRead(b->pin);
+  if (isPressed) {
+    b->buttonDown = true;
+    if (millis() > b->lastRelease + BUTTON_DEBOUNCE_DELAY_MS) {
+      b->pressHandled = false;
+      mostRecentInput = b->lastPress = millis();
+    }
+  } else {
+    b->buttonDown = false;
+    mostRecentInput = b->lastRelease = millis();
   }
 }

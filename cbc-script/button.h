@@ -5,7 +5,9 @@
 */
 
 #define BUTTON_DEBOUNCE_DELAY_US 5000
+#define BUTTON_DEBOUNCE_DELAY_MS 5
 #define BUTTON_HOLD_DELAY_US 1000000
+#define BUTTON_HOLD_DELAY_MS 1000
 
 // For tracking the status of a given button.
 enum BUTTON_STATE {
@@ -31,7 +33,7 @@ BUTTON_STATE queryButton(button* b) {
       b->pressHandled = true;
       return PRESS;
     }
-    if (micros() > b->lastPress + BUTTON_HOLD_DELAY_US) {
+    if (millis() > b->lastPress + BUTTON_HOLD_DELAY_MS) {
       return HOLD;
     }
     return WAIT;
