@@ -5,6 +5,7 @@
 */
 
 #include "button.h"
+#include "display.h"
 
 // Pin definitions.
 #define UP_BUTTON 15
